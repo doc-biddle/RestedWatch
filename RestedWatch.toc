@@ -5,6 +5,7 @@
 ## Author: Phillip
 ## X-License: GPL-3.0
 ## X-Website: https://gitlab.com/docbiddle/RestedWatch
+## X-Wago-ID: qGZAmvKd
 ## Version: @project-version@
 ## SavedVariables: RestedWatchDB
 ## OptionalDeps: Titan, LibDataBroker-1.1
