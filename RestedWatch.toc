@@ -6,6 +6,7 @@
 ## X-License: GPL-3.0
 ## X-Website: https://gitlab.com/docbiddle/RestedWatch
 ## X-Wago-ID: qGZAmvKd
+## X-Curse-Project-ID: 1799802
 ## Version: @project-version@
 ## SavedVariables: RestedWatchDB
 ## OptionalDeps: Titan, LibDataBroker-1.1
