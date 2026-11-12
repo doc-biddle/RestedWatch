@@ -1,11 +1,11 @@
 ## Interface: 16001
-## Title: Rested Watch |cff00aa001.4.0|r
+## Title: Rested Watch |cff00aa00@project-version@|r
 ## IconTexture: Interface\Icons\Spell_Nature_Sleep
 ## Notes: Shows how full each character's rested XP is and when it fills, including the Well Rested Legacy perk. /rested
 ## Author: Phillip
 ## X-License: GPL-3.0
 ## X-Website: https://gitlab.com/docbiddle/RestedWatch
-## Version: 1.4.0
+## Version: @project-version@
 ## SavedVariables: RestedWatchDB
 ## OptionalDeps: Titan, LibDataBroker-1.1
 
