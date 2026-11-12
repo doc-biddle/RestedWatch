@@ -1,0 +1,5 @@
+package-as: RestedWatch
+
+ignore:
+  - README.md
+  - .previews
