@@ -3,6 +3,12 @@
 Versions follow semantic versioning: MAJOR.MINOR.PATCH.
 MAJOR for changes that break saved settings or commands, MINOR for new features, PATCH for fixes.
 
+## 1.4.1 (2026-11-12)
+- No changes to the addon itself: this release moves it to the BigWigs packager.
+- Releases are now published on GitLab (gitlab.com/docbiddle/RestedWatch) and GitHub (github.com/doc-biddle/RestedWatch), each with a `-forever.zip` and `release.json` for WowUp. Wago is next.
+- The version shown in the AddOn List now comes from the release tag.
+- Licensed under GPL-3.0.
+
 ## 1.4.0 (2026-11-12)
 - Clock times: when each character fills ("today 18:40", "tomorrow 09:15", "Fri 14:20"), in a new "Full at" column and in the chat list.
 - Session burn for the character you're playing: rested XP used this session and about how many kills are left at double XP. Shown at the bottom of the Titan tooltip and in `/rested`. Survives `/reload`.
