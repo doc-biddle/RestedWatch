@@ -1,5 +1,7 @@
 # Rested Watch
 
+<img src="media/logo.png" alt="Rested Watch logo" width="128" align="right">
+
 A WoW Forever addon that keeps track of rested XP on all your characters, including each character's own rank of the Well Rested Legacy perk.
 
 - Shows how full each character's rested XP is, when it fills (countdown and clock time), and how long it has sat full.
