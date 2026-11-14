@@ -102,6 +102,28 @@ local function Project(c, now)
 	return levels / cap, levels, (cap - levels) / rate
 end
 
+-- The Cozy Sleeping Bag's buff (spell 429959): while it's up, you rest as if in an inn.
+local BAG_SPELL = 429959
+local function BagBuffLeft()
+	if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
+		local a = C_UnitAuras.GetPlayerAuraBySpellID(BAG_SPELL)
+		if a then return math.max(0, (a.expirationTime or 0) - GetTime()) end
+		return nil
+	end
+	for i = 1, 40 do
+		local name, _, _, _, _, expires, _, _, _, spellID = UnitBuff("player", i)
+		if not name then break end
+		if spellID == BAG_SPELL then return math.max(0, (expires or 0) - GetTime()) end
+	end
+end
+
+-- Resting by the game's own reckoning, or with the sleeping-bag buff up (which counts as an inn).
+local function RestingNow()
+	if IsResting() then return true end
+	local left = BagBuffLeft()
+	return left ~= nil and left > 0
+end
+
 local function Snapshot(online)
 	local d = DB()
 	local c = d.chars[Key()] or {}
@@ -122,7 +144,7 @@ local function Snapshot(online)
 	d.xpTable = d.xpTable or {}
 	d.xpTable[c.level] = xpMax
 	c.rested = GetXPExhaustion() or 0
-	c.resting = IsResting() and true or false
+	c.resting = RestingNow()
 	c.atMax = AtMaxLevel()
 	c.t = time()
 	c.online = online
@@ -418,9 +440,9 @@ end
 
 local ready = false   -- no snapshots at login until the logout record has been checked
 
--- Warn when a logout or quit countdown starts outside an inn or city.
+-- Warn when a logout or quit countdown starts outside an inn, a city or a sleeping bag.
 local function WarnIfOutside()
-	if IsResting() or AtMaxLevel() then return end
+	if RestingNow() or AtMaxLevel() then return end
 	local d = DB()
 	if d.warn == false then return end
 	if d.target and UnitLevel("player") >= d.target then return end
@@ -428,7 +450,7 @@ local function WarnIfOutside()
 	if not xpMax or xpMax <= 0 then return end
 	local c = d.chars[Key()] or {}
 	if (GetXPExhaustion() or 0) / xpMax >= Cap(d, c) - 0.005 then return end   -- already full
-	local msg = "Not in an inn or city: rested XP will build at a quarter of the speed."
+	local msg = "Not in an inn, a city or a sleeping bag: rested XP will build at a quarter of the speed."
 	if RaidNotice_AddMessage and RaidWarningFrame then
 		RaidNotice_AddMessage(RaidWarningFrame, msg, ChatTypeInfo and ChatTypeInfo["RAID_WARNING"] or { r = 1, g = 0.5, b = 0 })
 	end
@@ -541,8 +563,7 @@ local function SessionText()
 	return text .. ("%s left, about %d kills at double XP."):format(Num(r), math.ceil(r / (sum / #s.bonuses)))
 end
 
--- The Cozy Sleeping Bag: found in your bags by name, its buff is spell 429959.
-local BAG_SPELL = 429959
+-- The Cozy Sleeping Bag: found in your bags by name (its buff, BAG_SPELL, is near the top).
 local function FindBag()
 	local d = DB()
 	local getID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
@@ -562,18 +583,6 @@ local function FindBag()
 	return nil
 end
 
-local function BagBuffLeft()
-	if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
-		local a = C_UnitAuras.GetPlayerAuraBySpellID(BAG_SPELL)
-		if a then return math.max(0, (a.expirationTime or 0) - GetTime()) end
-		return nil
-	end
-	for i = 1, 40 do
-		local name, _, _, _, _, expires, _, _, _, spellID = UnitBuff("player", i)
-		if not name then break end
-		if spellID == BAG_SPELL then return math.max(0, (expires or 0) - GetTime()) end
-	end
-end
 
 -- "ready", "active" (seconds left) or "cooldown" (seconds left); nil without a bag.
 local function BagState()

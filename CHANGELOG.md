@@ -3,6 +3,9 @@
 Versions follow semantic versioning: MAJOR.MINOR.PATCH.
 MAJOR for changes that break saved settings or commands, MINOR for new features, PATCH for fixes.
 
+## 1.4.4 (2026-11-14)
+- With the Cozy Sleeping Bag's buff up, logging out no longer warns that you're not in an inn or city, and the character is recorded as resting, so its projection uses the inn rate. The bag counts as an inn even when the game doesn't report you as resting.
+
 ## 1.4.3 (2026-11-12)
 - First release on CurseForge, uploaded automatically by the release pipeline. No changes to the addon itself.
 - New logo, also used as the project icon on GitLab, GitHub, Wago and CurseForge.
