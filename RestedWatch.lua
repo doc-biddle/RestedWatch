@@ -5,7 +5,7 @@
 -- perk Well Rested. Legacy points are spent per character, so each character's own rank is read
 -- and stored. Each login compares the projection with the real value and corrects itself.
 
-local ADDON, ns = ...
+local _, ns = ...
 local BASE_RATE = 0.05 / (8 * 3600)   -- levels of rested XP per second while resting
 local BASE_CAP = 1.5                  -- levels of rested XP at the cap
 local OUTSIDE = 0.25                  -- logged out away from an inn or city
