@@ -3,6 +3,9 @@
 Versions follow semantic versioning: MAJOR.MINOR.PATCH.
 MAJOR for changes that break saved settings or commands, MINOR for new features, PATCH for fixes.
 
+## 1.4.5 (2026-11-15)
+- Logging out after walking away from the Cozy Sleeping Bag warns again. Its Well-Rested buff stays up for two hours, so the buff alone no longer counts as resting: only a stack gained in the last minute and a half (you're lying on the bag) does. Characters logged out like that were projected at the inn rate; their next login corrects it.
+
 ## 1.4.4 (2026-11-14)
 - With the Cozy Sleeping Bag's buff up, logging out no longer warns that you're not in an inn or city, and the character is recorded as resting, so its projection uses the inn rate. The bag counts as an inn even when the game doesn't report you as resting.
 

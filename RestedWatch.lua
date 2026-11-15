@@ -102,26 +102,32 @@ local function Project(c, now)
 	return levels / cap, levels, (cap - levels) / rate
 end
 
--- The Cozy Sleeping Bag's buff (spell 429959): while it's up, you rest as if in an inn.
+-- The Cozy Sleeping Bag's buff, Well-Rested (spell 429959): up to 3 stacks of +1% XP, one per minute on the bag, and it
+-- lasts 2 hours. Returns seconds left and seconds since it was last applied (a new stack refreshes it).
 local BAG_SPELL = 429959
+local BAG_FRESH = 90   -- applied this recently: you're on the bag, which counts as an inn
 local function BagBuffLeft()
 	if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
 		local a = C_UnitAuras.GetPlayerAuraBySpellID(BAG_SPELL)
-		if a then return math.max(0, (a.expirationTime or 0) - GetTime()) end
-		return nil
+		if not a then return nil end
+		local exp = a.expirationTime or 0
+		return math.max(0, exp - GetTime()), (a.duration and a.duration > 0) and (GetTime() - (exp - a.duration)) or nil
 	end
 	for i = 1, 40 do
-		local name, _, _, _, _, expires, _, _, _, spellID = UnitBuff("player", i)
+		local name, _, _, _, duration, expires, _, _, _, spellID = UnitBuff("player", i)
 		if not name then break end
-		if spellID == BAG_SPELL then return math.max(0, (expires or 0) - GetTime()) end
+		if spellID == BAG_SPELL then
+			return math.max(0, (expires or 0) - GetTime()), (duration and duration > 0) and (GetTime() - ((expires or 0) - duration)) or nil
+		end
 	end
 end
 
--- Resting by the game's own reckoning, or with the sleeping-bag buff up (which counts as an inn).
+-- Resting by the game's own reckoning, or lying on the sleeping bag. The buff alone isn't enough: it stays up for two
+-- hours after you walk away, so only a stack gained in the last minute and a half counts.
 local function RestingNow()
 	if IsResting() then return true end
-	local left = BagBuffLeft()
-	return left ~= nil and left > 0
+	local left, since = BagBuffLeft()
+	return left ~= nil and left > 0 and since ~= nil and since <= BAG_FRESH
 end
 
 local function Snapshot(online)

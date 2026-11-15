@@ -26,7 +26,10 @@ local function World(state)
 	game.IsInInstance = function() return false, "none" end
 	game.UnitAffectingCombat = function() return false end
 	game.C_UnitAuras = { GetPlayerAuraBySpellID = function(id)
-		if id == BAG_SPELL and state.bagBuff then return { expirationTime = 1000 + state.bagBuff } end
+		-- The buff lasts 2 hours from its last stack; bagApplied = seconds since that stack (default: just now).
+		if id == BAG_SPELL and state.bagBuff then
+			return { expirationTime = 1000 + state.bagBuff, duration = state.bagBuff + (state.bagApplied or 0) }
+		end
 	end }
 	game.RaidWarningFrame = game.CreateFrame("Frame", "RaidWarningFrame")
 	game.RaidNotice_AddMessage = function(_, msg) state.raidWarning = msg end
@@ -84,6 +87,16 @@ function cases.logout_with_sleeping_bag_is_recorded_as_resting()
 	local _, h = World({ resting = false, bagBuff = 1800 })
 	h.Fire("PLAYER_LOGOUT")
 	T.eq(h.Env().RestedWatchDB.chars["Shaan-Forever"].resting, true, "recorded as resting")
+end
+
+function cases.logout_after_leaving_the_sleeping_bag_warns()
+	-- Well-Rested stays up for two hours after you walk away from the bag: that's not resting.
+	local _, h, state = World({ resting = false, bagBuff = 7100, bagApplied = 600 })
+	h.Fire("PLAYER_CAMPING")
+	T.ok(Warned(h, state), "warning with only the leftover buff")
+	h.Fire("PLAYER_LOGOUT")
+	T.eq(h.Env().RestedWatchDB.chars["Shaan-Forever"].resting, false, "recorded as not resting")
+	T.clean(h)
 end
 
 function cases.no_warning_at_max_level()
