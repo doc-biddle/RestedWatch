@@ -96,7 +96,8 @@ local function Project(c, now)
 	local rate = BASE_RATE * RateMul(d, c) * (c.resting and 1 or OUTSIDE)
 	local levels = (c.rested or 0) / c.xpMax + rate * math.max(0, now - c.t)
 	if levels >= cap then
-		local fullSince = c.t + (cap - (c.rested or 0) / c.xpMax) / rate
+		-- Saved already at or over the cap (a Well Rested rank not read yet, say): full from that moment, not earlier.
+		local fullSince = math.max(c.t, c.t + (cap - (c.rested or 0) / c.xpMax) / rate)
 		return 1, cap, 0, fullSince
 	end
 	return levels / cap, levels, (cap - levels) / rate

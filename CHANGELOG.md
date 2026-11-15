@@ -3,6 +3,9 @@
 Versions follow semantic versioning: MAJOR.MINOR.PATCH.
 MAJOR for changes that break saved settings or commands, MINOR for new features, PATCH for fixes.
 
+## 1.4.6 (2026-11-15)
+- A character logged out with slightly more rested XP than Rested Watch thinks the cap is (its Well Rested rank not read yet, for one) no longer shows as full since hours before it logged out, with those hours added to "Wasted". It now counts as full from the moment it was last seen.
+
 ## 1.4.5 (2026-11-15)
 - Logging out after walking away from the Cozy Sleeping Bag warns again. Its Well-Rested buff stays up for two hours, so the buff alone no longer counts as resting: only a stack gained in the last minute and a half (you're lying on the bag) does. Characters logged out like that were projected at the inn rate; their next login corrects it.
 

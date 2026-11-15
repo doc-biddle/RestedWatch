@@ -114,4 +114,18 @@ function cases.slash_command_lists_characters()
 	T.clean(h)
 end
 
+function cases.character_saved_over_the_cap_is_full_from_when_it_was_seen()
+	-- 1.6 levels of rested XP against a cap worked out as 1.5 (its Well Rested rank isn't read yet), seen 10 minutes ago.
+	local _, h = World()
+	local now = h.Env().time()
+	h.Env().RestedWatchDB.chars["Alt-Forever"] = { name = "Alt", level = 20, xpMax = 10000, rested = 16000, resting = true, t = now - 600 }
+	h.ClearPrinted()
+	h.Slash("RESTEDWATCH", "")
+	local text = table.concat(h.Printed(), "\n")
+	T.has(text, "for 10m", "full for the 10 minutes since it was seen")
+	T.lacks(text, "16h", "not full since 16 hours before that")
+	T.lacks(text, "wasted full", "and no wasted time made up")
+	T.clean(h)
+end
+
 return cases
