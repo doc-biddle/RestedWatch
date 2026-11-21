@@ -58,7 +58,38 @@ local function ReadWellRested()
 	return nil
 end
 
-local function Key() return (UnitName("player") or "?") .. "-" .. (GetRealmName() or "") end
+-- The realm name, or nil when the game won't say. Since the Nov 2026 anti-layer-hopping hotfix Forever returns
+-- an empty string (or a secret value) for it, so the last realm seen is remembered and used instead.
+local function GameRealm()
+	local ok, realm = pcall(GetRealmName)
+	if not ok or (issecretvalue and issecretvalue(realm)) or type(realm) ~= "string" or realm == "" then return nil end
+	return realm
+end
+
+-- The character's key, "Name-Realm", using the last realm seen when the game won't say. An entry saved under
+-- a blank realm by an earlier version is folded into the right one (the newer reading wins) once a realm is known.
+local function Key()
+	local d = DB()
+	local name = UnitName("player") or "?"
+	local realm = GameRealm()
+	d.realmOf = d.realmOf or {}
+	if realm then
+		d.realmOf[name], d.realm = realm, realm
+	end
+	realm = realm or d.realmOf[name] or d.realm
+	if realm then
+		local key, stray = name .. "-" .. realm, d.chars[name .. "-"]
+		if stray then
+			local c = d.chars[key]
+			if not c or (stray.t or 0) > (c.t or 0) then d.chars[key] = stray end
+			d.chars[name .. "-"] = nil
+			if d.hidden[name .. "-"] then d.hidden[key], d.hidden[name .. "-"] = true, nil end
+		end
+		if d.session and d.session.key == name .. "-" then d.session.key = key end
+		return key
+	end
+	return name .. "-"
+end
 -- Read the logged-in character's Well Rested rank and store it on that character.
 local function UpdateRank(announce)
 	local c = DB().chars[Key()]

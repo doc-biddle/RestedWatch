@@ -14,7 +14,13 @@ local function World(state)
 	}
 	game.UnitName = function() return "Shaan" end
 	game.GetUnitName = function() return "Shaan" end
-	game.GetRealmName = function() return "Forever" end
+	game.GetRealmName = function() return state.realm or "Forever" end
+	if state.secretRealm then
+		local secret = {}
+		game.GetRealmName = function() return secret end
+		game.issecretvalue = function(v) return v == secret end
+	end
+	if state.saved then game.RestedWatchDB = state.saved end
 	game.UnitClass = function() return "Priest", "PRIEST" end
 	game.UnitFactionGroup = function() return "Horde" end
 	game.UnitLevel = function() return state.level or 30 end
@@ -125,6 +131,33 @@ function cases.character_saved_over_the_cap_is_full_from_when_it_was_seen()
 	T.has(text, "for 10m", "full for the 10 minutes since it was seen")
 	T.lacks(text, "16h", "not full since 16 hours before that")
 	T.lacks(text, "wasted full", "and no wasted time made up")
+	T.clean(h)
+end
+
+function cases.a_blank_realm_name_uses_the_last_realm_seen()
+	local _, h = World({ realm = "", saved = { realm = "Forever" } })
+	local d = h.Env().RestedWatchDB
+	T.ok(d.chars["Shaan-Forever"], "recorded under the known realm")
+	T.ok(not d.chars["Shaan-"], "nothing saved under a blank realm")
+	T.eq(d.session.key, "Shaan-Forever", "session")
+	T.clean(h)
+end
+
+function cases.an_entry_saved_under_a_blank_realm_is_folded_in()
+	local saved = { chars = {
+		["Shaan-"] = { name = "Shaan", level = 30, xpMax = 10000, rested = 5000, t = 2000 },
+		["Shaan-Forever"] = { name = "Shaan", level = 30, xpMax = 10000, rested = 100, t = 1 },
+	}, session = { key = "Shaan-", used = 0, bonuses = {} } }
+	local _, h = World({ saved = saved })
+	local d = h.Env().RestedWatchDB
+	T.ok(not d.chars["Shaan-"], "blank-realm entry removed")
+	T.ok(d.chars["Shaan-Forever"], "proper entry kept")
+	T.clean(h)
+end
+
+function cases.a_secret_realm_name_uses_the_last_realm_seen()
+	local _, h = World({ secretRealm = true, saved = { realm = "Forever" } })
+	T.ok(h.Env().RestedWatchDB.chars["Shaan-Forever"], "recorded under the known realm")
 	T.clean(h)
 end
 
