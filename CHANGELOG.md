@@ -3,6 +3,9 @@
 Versions follow semantic versioning: MAJOR.MINOR.PATCH.
 MAJOR for changes that break saved settings or commands, MINOR for new features, PATCH for fixes.
 
+## 1.4.8 (2026-11-21)
+- 1.4.7 only knew a realm it had seen itself, and since the hotfix it never sees one, so characters were still saved a second time under a blank realm and could be listed twice. It now takes the realm from the characters already saved, and folds the blank-realm entries back in.
+
 ## 1.4.7 (2026-11-21)
 - Works with Forever's anti-layer-hopping hotfix, which hides the realm name from addons. Characters are no longer saved a second time under a blank realm ("Moore-"), which left the list showing an old reading. The last realm seen is used instead, and entries saved that way by earlier versions are folded back in, keeping the newer reading.
 

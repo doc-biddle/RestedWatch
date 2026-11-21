@@ -161,4 +161,26 @@ function cases.a_secret_realm_name_uses_the_last_realm_seen()
 	T.clean(h)
 end
 
+function cases.with_no_realm_seen_the_saved_realm_is_used()
+	local saved = { chars = {
+		["Shaan-"] = { name = "Shaan", level = 30, xpMax = 10000, rested = 5000, t = 2000 },
+		["Shaan-Forever"] = { name = "Shaan", level = 30, xpMax = 10000, rested = 100, t = 1 },
+		["Mara-Forever"] = { name = "Mara", level = 10, xpMax = 1000, rested = 0, t = 1 },
+	}, session = { key = "Shaan-", used = 0, bonuses = {} } }
+	local _, h = World({ realm = "", saved = saved })
+	local d = h.Env().RestedWatchDB
+	T.ok(not d.chars["Shaan-"], "blank-realm entry folded in")
+	T.ok(d.chars["Shaan-Forever"], "kept under the saved realm")
+	T.eq(d.realm, "Forever", "realm remembered")
+	T.eq(d.session.key, "Shaan-Forever", "session")
+	T.clean(h)
+end
+
+function cases.a_new_character_uses_the_realm_the_others_share()
+	local saved = { chars = { ["Mara-Forever"] = { name = "Mara", level = 10, xpMax = 1000, rested = 0, t = 1 } } }
+	local _, h = World({ realm = "", saved = saved })
+	T.ok(h.Env().RestedWatchDB.chars["Shaan-Forever"], "new character under the shared realm")
+	T.clean(h)
+end
+
 return cases

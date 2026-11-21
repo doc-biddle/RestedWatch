@@ -66,6 +66,20 @@ local function GameRealm()
 	return realm
 end
 
+-- The realm already in the saved data, for when no realm has been seen since the hotfix: the one this character
+-- is saved under, or else the one realm every saved character shares. Nil if that can't be told.
+local function SavedRealm(list, name)
+	local only
+	for key in pairs(list) do
+		local n, realm = key:match("^(.-)%-(.+)$")
+		if realm then
+			if n == name then return realm end
+			if only and only ~= realm then only = false elseif only == nil then only = realm end
+		end
+	end
+	return only or nil
+end
+
 -- The character's key, "Name-Realm", using the last realm seen when the game won't say. An entry saved under
 -- a blank realm by an earlier version is folded into the right one (the newer reading wins) once a realm is known.
 local function Key()
@@ -76,7 +90,8 @@ local function Key()
 	if realm then
 		d.realmOf[name], d.realm = realm, realm
 	end
-	realm = realm or d.realmOf[name] or d.realm
+	realm = realm or d.realmOf[name] or d.realm or SavedRealm(d.chars, name)
+	if realm then d.realmOf[name], d.realm = realm, d.realm or realm end
 	if realm then
 		local key, stray = name .. "-" .. realm, d.chars[name .. "-"]
 		if stray then
